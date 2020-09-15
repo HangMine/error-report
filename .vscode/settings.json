@@ -1,0 +1,18 @@
+{
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "files.eol": "\n",
+  "javascript.validate.enable": true,
+  "[javascript]": {
+    "editor.formatOnSave": true
+  },
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+  ],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  
+}
