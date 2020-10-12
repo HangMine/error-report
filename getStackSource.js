@@ -70,7 +70,10 @@ const getStackSource = async (serverLog = {}) => {
 
 const main = async () => {
   try {
-    const params = JSON.parse(process.argv[3]);
+    if (!process.argv[2]) {
+      throw Error('参数为空')
+    }
+    const params = JSON.parse(process.argv[2]);
     const output = await getStackSource(params);
     console.log(output);
   } catch (error) {
