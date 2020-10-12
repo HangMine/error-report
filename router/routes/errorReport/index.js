@@ -1,9 +1,10 @@
 
 const md5 = require('js-md5');
 const { getParams, check, uploader } = require('../../../common');
-const { getSourceInfos } = require('./source');
-const { getGitInfo } = require('./git');
-const { postJira, checkJira } = require('./jira');
+const { getSourceInfos } = require('../../../utils/source');
+const { getGitInfo } = require('../../../utils/git');
+const { postJira, checkJira } = require('../../../utils/jira');
+const { jenkins } = require('../../../utils/jenkins');
 
 const main = async ({ serverLog, project, ref }) => {
   const { stack } = serverLog;

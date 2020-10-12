@@ -8,7 +8,7 @@ const colors = require("colors");
 const cloneProjects = require('./cloneProjects');
 
 const main = async () => {
-  await cloneProjects();
+  // await cloneProjects();
   const server = app.listen(8888, "localhost", async () => {
     const host = server.address().address;
     const port = server.address().port;
@@ -17,7 +17,3 @@ const main = async () => {
 }
 
 main()
-
-
-
-

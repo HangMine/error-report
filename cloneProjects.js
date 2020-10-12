@@ -1,5 +1,4 @@
 const { spawnSync } = require('child_process');
-const { rmdirSync } = require('fs');
 const { spawnPromise } = require('./common');
 
 const projectsMap = {
