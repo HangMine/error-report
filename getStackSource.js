@@ -5,11 +5,11 @@ const { getSourceInfos } = require('./utils/source');
 
 
 
-const getStackSource = async (serverLog = {}) => {
+const getStackSource = async (serverLog = {}, basePath = '') => {
 
   // ref默认master
   const { stack, project = 'demon-home', ref = "master", env, } = serverLog;
-  const sourceInfos = await getSourceInfos({ stack, project });
+  const sourceInfos = await getSourceInfos({ stack, project, basePath });
 
   const originStackArr = stack.split('\n');
   let sourceStackArr = [originStackArr[0]];
@@ -79,8 +79,9 @@ const main = async () => {
       throw Error('参数为空')
     }
     const params = JSON.parse(process.argv[2]);
-    const output = await Promise.all(params.map(item => getStackSource(item)))
-    console.log(output);
+    const basePath = process.argv[3];
+    const addedSourceParams = await Promise.all(params.map(item => getStackSource(item, basePath)));
+    console.log(JSON.stringify(addedSourceParams));
 
     // output.forEach(item => notifyError(item.markdown))
 

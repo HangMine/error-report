@@ -30,7 +30,9 @@ const params = [{
 const tt = `
 [{"componentTree":"? > Error-test","env":"development","file":"file","level":0,"message":"a is not defined","name":"ReferenceError","position":"vue: mounted hook","stack":"ReferenceError: a is not defined\\n","userAgent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36","versionHash":"hash","project":"demon-home"}]
 `
+/* 
 
+*/
 const { stdout, stderr } = spawnSync('node', ['getStackSource', JSON.stringify(params)], { encoding: 'utf-8' })
 
 console.log('---------stdout---------');

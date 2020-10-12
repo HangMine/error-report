@@ -20,7 +20,15 @@ const getSourceMap = async ({ path, project }) => {
   return sourceMap;
 };
 
-const getSourceInfos = async ({ stack, project }) => {
+const getMapPath = (file, basePath) => {
+  const basePathReg = /^http:\/\/(.*)\//
+  const originBasePathMatch = file.match(basePathReg) || [];
+  const resultBasePath = basePath || originBasePathMatch[0] || '';
+  const mapPath = `${file}.map`.replace(basePathReg, resultBasePath);
+  return mapPath
+}
+
+const getSourceInfos = async ({ stack, project, basePath }) => {
   let sourceInfos = []
   const stacks = new Stacktracey(stack).items; // 解析错误信息
 
@@ -29,7 +37,7 @@ const getSourceInfos = async ({ stack, project }) => {
     // 排除node_modules的堆栈：chunk-vendors可能包含非node_modules的公共模块,需检查vue-cli3的webpack配置
     if (file.includes('chunk-vendors')) continue;
 
-    const sourceMap = await getSourceMap({ path: `${file}.map`, project });
+    const sourceMap = await getSourceMap({ path: getMapPath(file, basePath), project });
 
     const sourceInfo = await SourceMapConsumer.with(sourceMap, null, consumer => {
       const _sourceInfo = consumer.originalPositionFor({ line, column });
