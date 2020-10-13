@@ -87,7 +87,7 @@ const main = async () => {
     // output.forEach(item => notifyError(item.markdown))
   } catch (error) {
     // process.stderr.write(error);
-    console.log(error)
+    console.error(error)
   }
 }
 
