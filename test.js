@@ -26,11 +26,6 @@ const params = [{
 }]
 
 
-
-const tt =
-  [{ "componentTree": "? > Error-test", "env": "development", "file": "src/views/test/error.vue", "level": 0, "message": "a is not defined", "name": "ReferenceError", "position": "vue: mounted hook (Promise/async)", "project": "art", "stack": "ReferenceError: a is not defined\n    at _callee$ (webpack-internal:///./node_modules/cache-loader/dist/cjs.js?!./node_modules/babel-loader/lib/index.js!./node_modules/ts-loader/index.js?!./node_modules/cache-loader/dist/cjs.js?!./node_modules/vue-loader/lib/index.js?!./src/views/test/error.vue?vue&type=script&lang=ts&:30:27)\n    at tryCatch (webpack-internal:///./node_modules/regenerator-runtime/runtime.js:63:40)\n    at Generator.invoke [as _invoke] (webpack-internal:///./node_modules/regenerator-runtime/runtime.js:293:22)\n    at Generator.eval [as next] (webpack-internal:///./node_modules/regenerator-runtime/runtime.js:118:21)\n    at asyncGeneratorStep (webpack-internal:///./node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:9:24)\n    at _next (webpack-internal:///./node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:31:9)", "userAgent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36", "versionHash": "" }]
-
-
 const { stdout, stderr } = spawnSync('node', ['getStackSource', JSON.stringify(params), '/Users/Administrator/Desktop/error-report/'], { encoding: 'utf-8' })
 
 console.log('---------stdout---------');
