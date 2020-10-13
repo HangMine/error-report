@@ -81,12 +81,11 @@ const main = async () => {
     const params = JSON.parse(process.argv[2]);
     const basePath = process.argv[3];
     const addedSourceParams = await Promise.all(params.map(item => getStackSource(item, basePath)));
-    console.log(JSON.stringify(addedSourceParams));
-
+    const output = JSON.stringify(addedSourceParams);
+    process.stdout.write(output);
     // output.forEach(item => notifyError(item.markdown))
-
   } catch (error) {
-    console.error(error);
+    process.stderr.write(error)
   }
 }
 

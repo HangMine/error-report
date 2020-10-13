@@ -7,7 +7,7 @@ const { SourceMapConsumer } = require('source-map');
 
 
 const getSourceMap = async ({ path, project }) => {
-  const isHttp = /(http:)?\/\//.test(path)
+  const isHttp = /^(http:)?\/\//.test(path)
   let sourceMap;
   if (isHttp) {
     sourceMap = (await axios(path)).data;
