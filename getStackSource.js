@@ -19,11 +19,12 @@ const getStackSource = async (serverLog = {}, basePath = '') => {
   sourceInfos.forEach((item, i) => {
     const { source, line, column } = item;
     const originRow = originStackArr[i + 1] || '';
-    const gitLabUrl = `http://gitlab.4dshoetech.local/front-end/${project}/blob/${ref}/${source}#L${line}`
-    const newRow = originRow.replace(/\(.*\)/, `(${source}:${line}:${column})`);
+    const gitLabUrl = `http://gitlab.4dshoetech.local/front-end/${project}/blob/${ref}/${source}#L${line}`;
+    const httpReg = /http(s)?:\/\/.*(\\n|(?=\)))/;
+    const newRow = originRow.replace(httpReg, `${source}:${line}:${column}`);
     sourceStackArr.push(newRow);
-    const markdownRow = originRow.replace(/\(.*\)/, `([${source}:${line}:${column}](${gitLabUrl}))`);
-    markdownStackArr.push(markdownRow)
+    const markdownRow = originRow.replace(httpReg, `[${source}:${line}:${column}](${gitLabUrl})`);
+    markdownStackArr.push(markdownRow);
   })
 
   const sourceStack = sourceStackArr.join('\n');
@@ -82,9 +83,9 @@ const main = async () => {
     const basePath = process.argv[3];
     const addedSourceParams = await Promise.all(params.map(item => getStackSource(item, basePath)));
     const output = JSON.stringify(addedSourceParams);
+    // addedSourceParams.forEach(item => notifyError(item.markdown));
     // process.stdout.write(output);
     console.log(output)
-    // output.forEach(item => notifyError(item.markdown))
   } catch (error) {
     // process.stderr.write(error);
     console.log('error\n', error)
