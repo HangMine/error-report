@@ -21,7 +21,7 @@ const getSourceMap = async ({ path, project }) => {
 };
 
 const getMapPath = (file, basePath) => {
-  const basePathReg = /^http:\/\/(.*)\//
+  const basePathReg = /^(http:)\/\/(.*)\//
   const originBasePathMatch = file.match(basePathReg) || [];
   const resultBasePath = basePath || originBasePathMatch[0] || '';
   const mapPath = `${file}.map`.replace(basePathReg, resultBasePath);
