@@ -10,33 +10,32 @@ const handleParams = async (serverLog = {}, basePath = '') => {
   const sourceInfos = await getSourceInfos({ stack, project, basePath });
 
   const originStackArr = stack.split('\n');
-  let sourceStackArr = [originStackArr[0]];
-  let markdownStackArr = [originStackArr[0]];
+  let sourceStackArr = [];
+  let markdownStackArr = [];
 
   // 根据原stack映射出source的stack
   sourceInfos.forEach((item, i) => {
     const { source, line, column } = item;
     const originRow = originStackArr[i + 1] || '';
     const gitLabUrl = `http://gitlab.4dshoetech.local/front-end/${project}/blob/${ref}/${source}#L${line}`;
-    const httpReg = /http(s)?:\/\/.*(\\n|(?=\)))/;
-    const newRow = originRow.replace(httpReg, `${source}:${line}:${column}`);
-    sourceStackArr.push(newRow);
+    const httpReg = /http(s)?:\/\/.*(\\n|(?=\)))?/;
+    const sourceRow = originRow.replace(httpReg, `${source}:${line}:${column}`);
+    sourceStackArr.push(sourceRow);
     const markdownRow = originRow.replace(httpReg, `[${source}:${line}:${column}](${gitLabUrl})`);
     markdownStackArr.push(markdownRow);
   })
 
   const sourceStack = sourceStackArr.join('\n');
   const textTitles = [
-    '[标题]前端告警',
-    `[项目]${project}`,
-    `[环境]${env}`,
-  ].map(item => `## ${item}\n`)
+    `### 前端告警: ${originStackArr[0]}`,
+    `**项目:** ${project}`,
+    `**环境:** ${env}`,
+  ];
 
   const markdown = {
-    title: "测试标题",
-    text: `${textTitles.join('')} >${markdownStackArr.join('\n')}`
-  }
-
+    title: "前端告警",
+    text: `${textTitles.map(title => `${title} \n\n`).join('')} ${markdownStackArr.map(row => `- ${row}\n\n`).join('')}`
+  };
 
   return {
     ...serverLog,
@@ -81,12 +80,11 @@ const getStackSource = async () => {
     const basePath = process.argv[3];
     const addedSourceParams = await Promise.all(params.map(item => handleParams(item, basePath)));
     const output = JSON.stringify(addedSourceParams);
-    // addedSourceParams.forEach(item => notifyError(item.markdown));
-    // process.stdout.write(output);
+    addedSourceParams.forEach(item => notifyError(item.markdown));
     console.log(output)
   } catch (error) {
-    // process.stderr.write(error);
-    console.log('获取堆栈源信息失败：\n', error)
+    console.log('获取堆栈源信息失败：\n')
+    console.table(error.stack.split('\n'))
   }
 }
 
