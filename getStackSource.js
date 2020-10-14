@@ -80,7 +80,7 @@ const getStackSource = async () => {
     const basePath = process.argv[3];
     const addedSourceParams = await Promise.all(params.map(item => handleParams(item, basePath)));
     const output = JSON.stringify(addedSourceParams);
-    addedSourceParams.forEach(item => notifyError(item.markdown));
+    // addedSourceParams.forEach(item => notifyError(item.markdown));
     console.log(output)
   } catch (error) {
     console.log('获取堆栈源信息失败：\n')
