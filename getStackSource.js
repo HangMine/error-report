@@ -3,8 +3,6 @@ const https = require('https')
 const axios = require('axios');
 const { getSourceInfos } = require('./utils/source');
 
-
-
 const getStackSource = async (serverLog = {}, basePath = '') => {
 
   // ref默认master
@@ -29,10 +27,10 @@ const getStackSource = async (serverLog = {}, basePath = '') => {
 
   const sourceStack = sourceStackArr.join('\n');
   const textTitles = [
-    '[测试]前端告警',
+    '[标题]前端告警',
     `[项目]${project}`,
     `[环境]${env}`,
-  ].map(item => `### ${item}\n`)
+  ].map(item => `## ${item}\n`)
 
   const markdown = {
     title: "测试标题",
@@ -88,7 +86,7 @@ const main = async () => {
     console.log(output)
   } catch (error) {
     // process.stderr.write(error);
-    console.log('error\n', error)
+    console.error('获取堆栈源信息失败：\n', error)
   }
 }
 
