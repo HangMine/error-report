@@ -14,7 +14,7 @@ const params = [{
 }]
 
 
-const { stdout, stderr } = spawnSync('node', ['getStackSource', JSON.stringify(params), '/Users/Administrator/Desktop/error-report/'], { encoding: 'utf-8' })
+const { stdout, stderr } = spawnSync('node', ['getStackSource', JSON.stringify(params), 'http://192.168.3.230'], { encoding: 'utf-8' })
 
 console.log('---------stdout---------');
 console.log(stdout)

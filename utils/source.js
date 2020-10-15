@@ -2,35 +2,39 @@
 const axios = require('axios');
 const Stacktracey = require('stacktracey');
 const { readFileSync } = require('fs');
-const { resolve } = require('path');
+const { resolve, join, sep } = require('path');
 const { SourceMapConsumer } = require('source-map');
 
+const httpReg = /^(http(s)?:)?\/\//;
 
 const getSourceMap = async ({ path, project }) => {
-  const isHttp = /^(http:)?\/\//.test(path)
+  const isHttp = httpReg.test(path);
   let sourceMap;
   if (isHttp) {
     sourceMap = (await axios(path)).data;
   } else {
-    path = resolve(`projects`, project, path);
-    const sourceMapText = readFileSync(path, { encoding: 'utf-8' });
+    const sourceMapText = readFileSync(resolve(`projects`, project, path), { encoding: 'utf-8' });
     sourceMap = JSON.parse(sourceMapText);
   }
-
   return sourceMap;
 };
 
-const getMapPath = (file, basePath) => {
-  const basePathReg = /^(http:)?\/\/(.*)\//;
-  const originBasePathMatch = file.match(basePathReg) || [];
-  const resultBasePath = basePath || originBasePathMatch[0] || '';
-  const mapPath = `${file}.map`.replace(basePathReg, resultBasePath);
-  // console.log('file路径：', file)
-  // console.log('mapPath路径：', mapPath)
-  return mapPath
+const path2HttpPath = (path = '') => {
+  if (path.startsWith(sep)) path = path.replace(sep, '');
+  return `http://${path.split(sep).join('/')}`;
 }
 
-const getSourceInfos = async ({ stack, project, basePath }) => {
+const getMapPath = ({ file, basePath, project, versionHash }) => {
+  const isHttpBasePath = httpReg.test(basePath)
+  const fileName = file.split('/').reverse()[0];
+  const mapFileName = `${fileName}.map`;
+  let mapPath = basePath ? join(basePath, project, versionHash, 'js', mapFileName) : `${file}.map`;
+  if (isHttpBasePath) mapPath = path2HttpPath(mapPath);
+  // console.log('mapPath地址：', mapPath);
+  return mapPath;
+}
+
+const getSourceInfos = async ({ stack, project, basePath, versionHash }) => {
   let sourceInfos = []
   const stacks = new Stacktracey(stack).items; // 解析错误信息
 
@@ -39,7 +43,7 @@ const getSourceInfos = async ({ stack, project, basePath }) => {
     // 排除node_modules的堆栈：chunk-vendors可能包含非node_modules的公共模块,需检查vue-cli3的webpack配置
     if (file.includes('chunk-vendors')) continue;
 
-    const sourceMap = await getSourceMap({ path: getMapPath(file, basePath), project });
+    const sourceMap = await getSourceMap({ path: getMapPath({ file, basePath, project, versionHash }), project });
 
     const sourceInfo = await SourceMapConsumer.with(sourceMap, null, consumer => {
       const _sourceInfo = consumer.originalPositionFor({ line, column });

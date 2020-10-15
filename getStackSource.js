@@ -1,13 +1,13 @@
 
-const https = require('https')
+const https = require('https');
 const axios = require('axios');
 const { getSourceInfos } = require('./utils/source');
 
 const handleParams = async (serverLog = {}, basePath = '') => {
 
   // ref默认master
-  const { stack, project = 'demon-home', ref = "master", env, } = serverLog;
-  const sourceInfos = await getSourceInfos({ stack, project, basePath });
+  const { stack, project = 'demon-home', ref = "master", env, versionHash } = serverLog;
+  const sourceInfos = await getSourceInfos({ stack, project, basePath, versionHash });
 
   const originStackArr = stack.split('\n');
   let sourceStackArr = [];
@@ -83,8 +83,7 @@ const getStackSource = async () => {
     // addedSourceParams.forEach(item => notifyError(item.markdown));
     console.log(output)
   } catch (error) {
-    console.log('获取堆栈源信息失败：\n')
-    console.table(error.stack.split('\n'))
+    console.log('获取堆栈源信息失败：\n', error)
   }
 }
 
