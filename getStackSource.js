@@ -3,10 +3,20 @@ const https = require('https');
 const axios = require('axios');
 const { getSourceInfos } = require('./utils/source');
 
+const getGitProjectName = (project) => {
+  const projectMap = {
+    art: 'demon-home',
+    'material-admin': 'material-admin',
+    opt: 'opt',
+  }
+  return projectMap[project] || 'art'
+}
+
+
 const handleParams = async (serverLog = {}, basePath = '') => {
 
   // ref默认master
-  const { stack, project = 'demon-home', ref = "master", env, versionHash } = serverLog;
+  const { stack, project = 'art', ref = "master", env, versionHash } = serverLog;
   const sourceInfos = await getSourceInfos({ stack, project, basePath, versionHash });
 
   const originStackArr = stack.split('\n');
@@ -17,7 +27,7 @@ const handleParams = async (serverLog = {}, basePath = '') => {
   sourceInfos.forEach((item, i) => {
     const { source, line, column } = item;
     const originRow = originStackArr[i + 1] || '';
-    const gitLabUrl = `http://gitlab.4dshoetech.local/front-end/${project}/blob/${ref}/${source}#L${line}`;
+    const gitLabUrl = `http://gitlab.4dshoetech.local/front-end/${getGitProjectName(project)}/blob/${ref}/${source}#L${line}`;
     const httpReg = /http(s)?:\/\/.*(\\n|(?=\)))?/;
     const sourceRow = originRow.replace(httpReg, `${source}:${line}:${column}`);
     sourceStackArr.push(sourceRow);
