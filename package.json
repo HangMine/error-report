@@ -1,12 +1,14 @@
 {
   "name": "@4dst-saas/frontend-error-report",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "前端错误上报",
   "main": "index.js",
   "repository": "https://github.com/HangMine/error-report.git",
   "author": "ZhengHangFeng <zhenghf@4dstc.com>",
   "license": "MIT",
-  "keywords":["error-report"],
+  "keywords": [
+    "error-report"
+  ],
   "scripts": {
     "start": "nodemon index.js",
     "pub": "npm version patch && npm publish"
