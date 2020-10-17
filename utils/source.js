@@ -29,15 +29,14 @@ const getMapPath = ({ file, basePath, project, versionHash }) => {
   const fileName = file.split('/').reverse()[0];
   const mapFileName = `${fileName}.map`;
   mapPath = isHttpBasePath ? path2HttpPath(mapPath) : basePath ? join(basePath, project, versionHash, 'js', mapFileName) : `${file}.map`;
-  console.log('file地址：', file);
-  console.log('mapPath地址：', mapPath);
+
   return mapPath;
 }
 
 const getSourceInfos = async ({ stack, project, basePath, versionHash }) => {
   let sourceInfos = []
   const stacks = new Stacktracey(stack).items; // 解析错误信息
-
+  console.log('stacks:\n', stacks);
   for (const item of stacks) {
     const { file, line, column } = item;
     // 排除node_modules的堆栈：chunk-vendors可能包含非node_modules的公共模块,需检查vue-cli3的webpack配置
