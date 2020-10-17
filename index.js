@@ -5,7 +5,7 @@ extend();
 const router = require("./router");
 router(app);
 const colors = require("colors");
-const cloneProjects = require('./cloneProjects');
+const cloneProjects = require('./clone-projects');
 
 const main = async () => {
   // await cloneProjects();

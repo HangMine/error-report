@@ -12,28 +12,42 @@ const getGitProjectName = (project) => {
   return projectMap[project] || 'art'
 }
 
-
-const handleParams = async (serverLog = {}, basePath = '') => {
-
-  // ref默认master
-  const { stack, project = 'art', ref = "master", env, versionHash } = serverLog;
-  const sourceInfos = await getSourceInfos({ stack, project, basePath, versionHash });
-
-  const originStackArr = stack.split('\n');
+const getStackArrs = ({ originStackArr, sourceInfos, project, ref }) => {
   let sourceStackArr = [];
   let markdownStackArr = [];
+
+  const getHttpStr = (row) => {
+    const httpReg = /\(?(https?:\/\/[^)]*)\)?/;
+    const httpMatch = row.match(httpReg) || [];
+    const httpStr = httpMatch[1];
+    return httpStr;
+  }
+
 
   // 根据原stack映射出source的stack
   sourceInfos.forEach(item => {
     const { source, line, column, stackLine } = item;
     const originRow = originStackArr[+stackLine + 1] || '';
     const gitLabUrl = `http://gitlab.4dshoetech.local/front-end/${getGitProjectName(project)}/blob/${ref}/${source}#L${line}`;
-    const httpReg = /http(s)?:\/\/.*(\\n|(?=\)))?/;
-    const sourceRow = originRow.replace(httpReg, `${source}:${line}:${column}`);
+    item.gitLabUrl = gitLabUrl;
+    const httpStr = getHttpStr(originRow);
+    const sourceRow = originRow.replace(httpStr, `${source}:${line}:${column}`);
     sourceStackArr.push(sourceRow);
-    const markdownRow = originRow.replace(httpReg, `[${source}:${line}:${column}](${gitLabUrl})`);
+    const markdownRow = originRow.replace(httpStr, `[${source}:${line}:${column}](${gitLabUrl})`);
     markdownStackArr.push(markdownRow);
   })
+  return [sourceStackArr, markdownStackArr];
+}
+
+
+const handleServerLog = async (serverLog = {}, basePath = '') => {
+
+  // ref默认master
+  const { stack, project = 'art', ref = "master", env, versionHash } = serverLog;
+  const sourceInfos = await getSourceInfos({ stack, project, basePath, versionHash });
+
+  const originStackArr = stack.split('\n');
+  const [sourceStackArr, markdownStackArr] = getStackArrs({ originStackArr, sourceInfos, project, ref });
 
   const sourceStack = sourceStackArr.join('\n');
   const textTitles = [
@@ -86,11 +100,11 @@ const getStackSource = async () => {
     if (!process.argv[2]) {
       throw Error('参数为空')
     }
-    const params = JSON.parse(process.argv[2]);
+    const serverLogs = JSON.parse(process.argv[2]);
     const basePath = process.argv[3];
-    const addedSourceParams = await Promise.all(params.map(item => handleParams(item, basePath)));
-    const output = JSON.stringify(addedSourceParams);
-    // addedSourceParams.forEach(item => notifyError(item.markdown));
+    const handledServerLogs = await Promise.all(serverLogs.map(serverLog => handleServerLog(serverLog, basePath)));
+    const output = JSON.stringify(handledServerLogs);
+    // handledServerLogs.forEach(item => notifyError(item.markdown));
     console.log(output)
   } catch (error) {
     console.log('获取堆栈源信息失败：\n', error)
