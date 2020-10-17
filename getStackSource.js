@@ -24,9 +24,9 @@ const handleParams = async (serverLog = {}, basePath = '') => {
   let markdownStackArr = [];
 
   // 根据原stack映射出source的stack
-  sourceInfos.forEach((item, i) => {
-    const { source, line, column } = item;
-    const originRow = originStackArr[i + 1] || '';
+  sourceInfos.forEach(item => {
+    const { source, line, column, stackLine } = item;
+    const originRow = originStackArr[+stackLine + 1] || '';
     const gitLabUrl = `http://gitlab.4dshoetech.local/front-end/${getGitProjectName(project)}/blob/${ref}/${source}#L${line}`;
     const httpReg = /http(s)?:\/\/.*(\\n|(?=\)))?/;
     const sourceRow = originRow.replace(httpReg, `${source}:${line}:${column}`);

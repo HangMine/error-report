@@ -37,7 +37,7 @@ const getMapPath = ({ fileName, basePath, project, versionHash }) => {
 const getSourceInfos = async ({ stack, project, basePath, versionHash }) => {
   let sourceInfos = []
   const stacks = new Stacktracey(stack).items; // 解析错误信息
-  for (const item of stacks) {
+  for (const [stackLine, item] of Object.entries(stacks)) {
     const { file, line, column, fileName } = item;
     // 排除node_modules的堆栈：chunk-vendors可能包含非node_modules的公共模块,需检查vue-cli3的webpack配置
     // 解析出来的item可能出现没有fileName的情况：比如 at new Promise (<anonymous>) ，通过fileName忽略这种情况
@@ -49,6 +49,9 @@ const getSourceInfos = async ({ stack, project, basePath, versionHash }) => {
       _sourceInfo.source = _sourceInfo.source.replace('webpack:///', '').replace(/\?.*$/, '');
       return _sourceInfo;
     });
+
+    // 设置stackLine，替换原stack时需要用到
+    sourceInfo.stackLine = stackLine;
 
     // 排除node_modules的堆栈：需要先请求每一个map文件拿到源文件，比较慢
     // if (sourceInfo.source.includes('node_modules')) continue;
