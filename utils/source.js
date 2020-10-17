@@ -25,12 +25,12 @@ const path2HttpPath = (path = '') => {
 }
 
 const getMapPath = ({ file, basePath, project, versionHash }) => {
-  const isHttpBasePath = httpReg.test(basePath)
+  const isHttpBasePath = httpReg.test(basePath);
   const fileName = file.split('/').reverse()[0];
   const mapFileName = `${fileName}.map`;
-  let mapPath = basePath ? join(basePath, project, versionHash, 'js', mapFileName) : `${file}.map`;
-  if (isHttpBasePath) mapPath = path2HttpPath(mapPath);
-  // console.log('mapPath地址：', mapPath);
+  mapPath = isHttpBasePath ? path2HttpPath(mapPath) : basePath ? join(basePath, project, versionHash, 'js', mapFileName) : `${file}.map`;
+  console.log('file地址：', file);
+  console.log('mapPath地址：', mapPath);
   return mapPath;
 }
 
