@@ -1,7 +1,12 @@
 
 const https = require('https');
 const axios = require('axios');
-const { getSourceInfos } = require('./utils/source');
+const path = require('path')
+const { writeFile } = require('fs/promises')
+const { getSourceInfos } = require('../utils/source');
+const { getErrorMd5 } = require('../utils/common');
+const temErrorMd5Map = require('./tem-error-md5-map.json');
+
 
 const getGitProjectName = (project) => {
   const projectMap = {
@@ -40,8 +45,25 @@ const getStackArrs = ({ originStackArr, sourceInfos, project, ref }) => {
   return [sourceStackArr, markdownStackArr];
 }
 
+const writeTemErrorMd5Map = async (data) => {
+  const res = writeFile(path.resolve(__dirname, './tem-error-md5-map.json'), JSON.stringify(data));
+  return res;
+}
+
+// 两秒内不收集重复的错误，避免同个错误报太多次，导致钉钉1分钟超出20条
+const clearTemErrorMd5Map = (timeout = 2000) => {
+  setTimeout(() => {
+    writeTemErrorMd5Map({})
+  }, timeout);
+}
 
 const handleServerLog = async (serverLog = {}, basePath = '') => {
+
+  // 单次
+  // const errorMd5 = getErrorMd5(serverLog);
+  // if (temErrorMd5Map[errorMd5]) return;
+  // temErrorMd5Map[errorMd5] = true;
+  // await writeTemErrorMd5Map(temErrorMd5Map);
 
   // ref默认master
   const { stack, project = 'art', ref = "master", env, versionHash } = serverLog;
@@ -103,12 +125,15 @@ const getStackSource = async () => {
     }
     const serverLogs = JSON.parse(process.argv[2]);
     const basePath = process.argv[3];
-    const handledServerLogs = await Promise.all(serverLogs.map(serverLog => handleServerLog(serverLog, basePath)));
+    const handledServerLogs = await Promise.all(serverLogs.map(serverLog => handleServerLog(serverLog, basePath)).filter(item => item));
     const output = JSON.stringify(handledServerLogs);
     // handledServerLogs.forEach(item => notifyError(item.markdown));
-    console.log(output)
+    // clearTemErrorMd5Map();
+    console.log(output);
   } catch (error) {
     console.log('获取堆栈源信息失败：\n', error)
+  } finally {
+
   }
 }
 

@@ -53,8 +53,12 @@ const getSourceInfos = async ({ stack, project, basePath, versionHash }) => {
     // 设置stackLine，替换原stack时需要用到
     sourceInfo.stackLine = stackLine;
 
-    // 排除node_modules的堆栈：需要先请求每一个map文件拿到源文件，比较慢
-    // if (sourceInfo.source.includes('node_modules')) continue;
+    /* 
+    排除node_modules的堆栈：需要先请求每一个map文件拿到源文件，比较慢
+    有部分情况通过chunk-vendors无法过滤到node_modules,参数如test文件里面的hasNodeModuelsParams
+    所以现在采用优先通过chunk-vendors过滤，再使用node_modules二次过滤
+    */
+    if (sourceInfo.source.includes('node_modules')) continue;
 
     sourceInfos.push(sourceInfo)
   }

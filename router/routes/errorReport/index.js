@@ -1,15 +1,16 @@
 
-const md5 = require('js-md5');
+
 const { getParams, check, uploader } = require('../../../common');
 const { getSourceInfos } = require('../../../utils/source');
 const { getGitInfo } = require('../../../utils/git');
 const { postJira, checkJira } = require('../../../utils/jira');
 const { jenkins } = require('../../../utils/jenkins');
+const { getErrorMd5 } = require('../../../utils/common');
 
-const main = async ({ serverLog, project, ref }) => {
-  const { stack } = serverLog;
+const main = async (serverLog) => {
+  const { stack, project, ref } = serverLog;
   // md5加上项目名,因为检查md5值是全局搜索description
-  const errorMd5 = md5(`${project} ${stack}`);
+  const errorMd5 = getErrorMd5(serverLog);
   if (await checkJira(errorMd5)) {
     return {
       code: '-2',
@@ -33,9 +34,9 @@ const main = async ({ serverLog, project, ref }) => {
 }
 
 const errorReport = async (req, res) => {
-  const { serverLog = {}, project = 'demon-home', ref } = getParams(req);
+  const { serverLog = {} } = getParams(req);
   try {
-    const response = await main({ serverLog, project, ref });
+    const response = await main(serverLog);
     console.log(response)
     res.send(response)
   } catch (error) {
