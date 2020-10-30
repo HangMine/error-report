@@ -6,14 +6,25 @@ const gitAxios = axios.create({
   headers: { 'PRIVATE-TOKEN': 'G_Z2YE9hAkLFzqsWVyS4' }
 })
 
-const user2Email = ({ project, commiter }) => {
-  const path = resolve('projects', project, 'package.json');
-  const { maintainers } = require(path);
-  const maintainer = maintainers.find(item => item.name === commiter) || {};
-  return maintainer.email || ''
+const project2Id = {
+  'art': 7,
+  'material-admin': 84,
 }
 
-const getGitInfo = ({ project, ref, file, line }) => {
+const getMaintainers = async ({ project, ref }) => {
+  const projectId = project2Id[project];
+  const filePath = 'package.json';
+  const content = (await gitAxios(`/projects/${projectId}/repository/files/${filePath}/raw`, { params: { ref } })).data;
+  return content.maintainers;
+}
+
+const getCommiterInfo = async ({ project, ref, commiter, type }) => {
+  const maintainers = await getMaintainers({ project, ref })
+  const maintainer = maintainers.find(item => item.name === commiter) || {};
+  return maintainer[type] || ''
+}
+
+const getGitInfo = async ({ project, ref, file, line }) => {
   const gitExec = (args = [], options = {}) => {
     const subProcess = spawnSync('git', args, { cwd: `projects/${project}`, encoding: 'utf-8', ...options });
     return subProcess.stdout;
@@ -26,7 +37,7 @@ const getGitInfo = ({ project, ref, file, line }) => {
   const commitId = row.slice(0, 10) || '';
   const matches = row.match(/(?<=\().*?(?=\))/)
   const commiter = matches && matches[0].split(' ')[0] || '';
-  const commiterEmail = user2Email({ project, commiter });
+  const commiterEmail = await getCommiterInfo({ project, ref, commiter, type: 'email' });
 
   return {
     line,

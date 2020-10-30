@@ -73,11 +73,13 @@ const handleServerLog = async (serverLog = {}, basePath = '') => {
   const [sourceStackArr, markdownStackArr] = getStackArrs({ originStackArr, sourceInfos, project, ref });
 
   const sourceStack = sourceStackArr.join('\n');
-  const textTitles = [
+  const sitTextTitles = [
     `### 前端告警: ${originStackArr[0]}`,
     `**项目:** ${project}`,
     `**环境:** ${env}`,
   ];
+  const prodTextTitles = ['uat', 'production'].includes(env) ? ['异常日志告警'] : [];
+  const textTitles = [...prodTextTitles, ...sitTextTitles];
 
   const markdown = {
     title: "前端告警",
@@ -92,9 +94,9 @@ const handleServerLog = async (serverLog = {}, basePath = '') => {
   }
 }
 
-const notifyError = (markdown) => {
+const notifyError = async (params) => {
   try {
-    axios({
+    const res = await axios({
       url: 'https://oapi.dingtalk.com/robot/send?access_token=821ba73676cb87501fb2051cb25bec5484e0fba0193a9baa0c0bea1c6af60c54',
       method: 'post',
       // 为了忽略https证书错误
@@ -106,10 +108,11 @@ const notifyError = (markdown) => {
       },
       data: {
         msgtype: "markdown",
-        markdown
+        ...params
       }
     })
-    console.log('--------报警成功----------')
+    console.log('--------报警成功----------');
+    console.log(res);
   } catch (error) {
     console.error('--------报警失败----------');
     console.error(error)
