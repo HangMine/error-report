@@ -10,7 +10,7 @@ const temErrorMd5Map = require('./tem-error-md5-map.json');
 
 const getGitProjectName = (project) => {
   const projectMap = {
-    art: 'demon-home',
+    art: 'ideation',
     'material-admin': 'material-admin',
     opt: 'opt',
   }

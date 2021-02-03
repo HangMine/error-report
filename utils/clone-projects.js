@@ -5,8 +5,8 @@ const { spawnPromise } = require('../common');
 
 const projectsMap = {
   'art': {
-    dirName: 'demon-home',
-    gitUrl: 'git@192.168.19.2:front-end/demon-home.git'
+    dirName: 'ideation',
+    gitUrl: 'git@192.168.19.2:front-end/ideation.git'
   },
   'material-admin': {
     dirName: 'anta-admin',
