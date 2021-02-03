@@ -17,7 +17,7 @@ const getGitProjectName = (project) => {
   return projectMap[project] || 'art'
 }
 
-const getStackArrs = ({ originStackArr, sourceInfos, project, ref }) => {
+const getStackArrs = ({ originStackArr, sourceInfos, project, ref, versionHash }) => {
   let sourceStackArr = [];
   let markdownStackArr = [];
 
@@ -28,13 +28,15 @@ const getStackArrs = ({ originStackArr, sourceInfos, project, ref }) => {
     return httpStr;
   }
 
-  const getRef = () => ref.replace(/^origin\//, '')
+  const getRef = () => ref.replace(/^origin\//, '');
 
-  // 根据原stack映射出source的stack
+  const getVersionHash = () => versionHash
+
+
   sourceInfos.forEach(item => {
     const { source, line, column, stackLine } = item;
     const originRow = originStackArr[+stackLine + 1] || '';
-    const gitLabUrl = `http://gitlab.4dshoetech.local/front-end/${getGitProjectName(project)}/blob/${getRef()}/${source}#L${line}`;
+    const gitLabUrl = `http://gitlab.4dshoetech.local/front-end/${getGitProjectName(project)}/blob/${getVersionHash()}/${source}#L${line}`;
     item.gitLabUrl = gitLabUrl;
     const httpStr = getHttpStr(originRow);
     const sourceRow = originRow.replace(httpStr, `${source}:${line}:${column}`);
@@ -70,7 +72,7 @@ const handleServerLog = async (serverLog = {}, basePath = '') => {
   const sourceInfos = await getSourceInfos({ stack, project, basePath, versionHash });
 
   const originStackArr = stack.split('\n');
-  const [sourceStackArr, markdownStackArr] = getStackArrs({ originStackArr, sourceInfos, project, ref });
+  const [sourceStackArr, markdownStackArr] = getStackArrs({ originStackArr, sourceInfos, project, ref, versionHash });
 
   const sourceStack = sourceStackArr.join('\n');
   const sitTextTitles = [

@@ -41,7 +41,8 @@ const getSourceInfos = async ({ stack, project, basePath, versionHash }) => {
     const { file, line, column, fileName } = item;
     // 排除node_modules的堆栈：chunk-vendors可能包含非node_modules的公共模块,需检查vue-cli3的webpack配置
     // 解析出来的item可能出现没有fileName的情况：比如 at new Promise (<anonymous>) ，通过fileName忽略这种情况
-    if (file.includes('chunk-vendors') || !fileName) continue;
+    // if (file.includes('chunk-vendors') || !fileName) continue;
+    if (!fileName) continue;
 
     const sourceMap = await getSourceMap({ path: getMapPath({ fileName, basePath, project, versionHash }), project });
     const sourceInfo = await SourceMapConsumer.with(sourceMap, null, consumer => {
@@ -58,7 +59,7 @@ const getSourceInfos = async ({ stack, project, basePath, versionHash }) => {
     有部分情况通过chunk-vendors无法过滤到node_modules,参数如test文件里面的hasNodeModuelsParams
     所以现在采用优先通过chunk-vendors过滤，再使用node_modules二次过滤
     */
-    if (sourceInfo.source.includes('node_modules')) continue;
+    // if (sourceInfo.source.includes('node_modules')) continue;
 
     sourceInfos.push(sourceInfo)
   }
