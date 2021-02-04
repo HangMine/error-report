@@ -4,6 +4,7 @@ const Stacktracey = require('stacktracey');
 const { readFileSync } = require('fs');
 const { resolve, join, sep } = require('path');
 const { SourceMapConsumer } = require('source-map');
+const { getPackageInfo, getPackageVersion } = require('./parse-yarn-lock')
 
 const httpReg = /^(http(s)?:)?\/\//;
 
@@ -60,6 +61,18 @@ const getSourceInfos = async ({ stack, project, basePath, versionHash }) => {
     所以现在采用优先通过chunk-vendors过滤，再使用node_modules二次过滤
     */
     // if (sourceInfo.source.includes('node_modules')) continue;
+
+    if (sourceInfo.source.includes('node_modules')) {
+      const packageInfo = getPackageInfo(sourceInfo.source);
+      const packageVersion = getPackageVersion({
+        basePath, project, versionHash, sourcePath: sourceInfo.source
+      });
+      sourceInfo.packageInfo = {
+        name: packageInfo.packageName,
+        path: packageInfo.packagePath,
+        version: packageVersion
+      }
+    }
 
     sourceInfos.push(sourceInfo)
   }

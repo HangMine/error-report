@@ -34,14 +34,20 @@ const getStackArrs = ({ originStackArr, sourceInfos, project, ref, versionHash }
 
 
   sourceInfos.forEach(item => {
-    const { source, line, column, stackLine } = item;
+    const { source, line, column, stackLine, packageInfo } = item;
     const originRow = originStackArr[+stackLine + 1] || '';
-    const gitLabUrl = `http://gitlab.4dshoetech.local/front-end/${getGitProjectName(project)}/blob/${getVersionHash()}/${source}#L${line}`;
-    item.gitLabUrl = gitLabUrl;
+    if (packageInfo) {
+      // 公共模块
+      const { name, path, version } = packageInfo;
+      item.originUrl = `https://unpkg.com/browse/${name}${version ? `@${version}` : ''}/${path}#L${line}`;
+    } else {
+      // 非公共模块
+      item.originUrl = `http://gitlab.4dshoetech.local/front-end/${getGitProjectName(project)}/blob/${getVersionHash()}/${source}#L${line}`;
+    }
     const httpStr = getHttpStr(originRow);
     const sourceRow = originRow.replace(httpStr, `${source}:${line}:${column}`);
     sourceStackArr.push(sourceRow);
-    const markdownRow = originRow.replace(httpStr, `[${source}:${line}:${column}](${gitLabUrl})`);
+    const markdownRow = originRow.replace(httpStr, `[${source}:${line}:${column}](${item.originUrl})`);
     markdownStackArr.push(markdownRow);
   })
   return [sourceStackArr, markdownStackArr];
