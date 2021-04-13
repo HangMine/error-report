@@ -74,20 +74,25 @@ const handleServerLog = async (serverLog = {}, basePath = '') => {
   // await writeTemErrorMd5Map(temErrorMd5Map);
 
   // ref默认master
-  const { stack, project = 'art', ref = "master", env, versionHash } = serverLog;
+  const { stack, project = 'art', ref = "master", env, versionHash, user = {}, url } = serverLog;
   const sourceInfos = await getSourceInfos({ stack, project, basePath, versionHash });
 
   const originStackArr = stack.split('\n');
   const [sourceStackArr, markdownStackArr] = getStackArrs({ originStackArr, sourceInfos, project, ref, versionHash });
 
   const sourceStack = sourceStackArr.join('\n');
-  const sitTextTitles = [
+  const prodErrorTitle = ['uat', 'production'].includes(env) ? ['异常日志告警'] : []
+  const userIdTitle = user.id ? [`**用户ID:** ${user.id}`] : [];
+  const userAccountTitle = user.account ? [`**用户账户:** ${user.account}`] : [];
+  const textTitles = [
+    ...prodErrorTitle,
     `### 前端告警: ${originStackArr[0]}`,
     `**项目:** ${project}`,
     `**环境:** ${env}`,
+    `**url:** ${url}`,
+    ...userIdTitle,
+    ...userAccountTitle
   ];
-  const prodTextTitles = ['uat', 'production'].includes(env) ? ['异常日志告警'] : [];
-  const textTitles = [...prodTextTitles, ...sitTextTitles];
 
   const markdown = {
     title: "前端告警",
